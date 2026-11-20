@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   offline-checks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         python: ['3.9', '3.12']
@@ -33,7 +33,7 @@ jobs:
               json.loads(path.read_text())
           PY
   secret-scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
