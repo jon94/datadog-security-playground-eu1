@@ -34,9 +34,23 @@ class ScopeChecks(unittest.TestCase):
         self.assertEqual(len(kills),3)
         guard='container.id == "'+'a'*64+'"'
         for r,a in kills:
-            self.assertIn(guard,r['expression']);self.assertEqual(a['filter'],guard)
+            self.assertIn(guard,r['expression'])
+            self.assertEqual(set(a), {'kill'})
             self.assertEqual(a['kill'],{'scope':'process','signal':'SIGKILL'})
         self.assertEqual(kube.call_args.args[1:3],('apply','-f'))
+
+    def test_policy_rejects_unguarded_or_broader_kills_before_apply(self):
+        pod={'metadata':{'name':'playground-app-test'},'spec':{'nodeName':'demo-node'},'status':{'containerStatuses':[{'containerID':'containerd://'+'a'*64,'ready':True}]}}
+        guard='container.id == "__PLAYGROUND_CONTAINER_ID__"'
+        template_dir=self.out/'templates'
+        template_dir.mkdir()
+        for expression,scope in [('exec.file.name == "sleep"','process'),(guard,'container')]:
+            with self.subTest(expression=expression,scope=scope):
+                rule={'id':'test_rule','expression':expression,'actions':[{'kill':{'signal':'SIGKILL','scope':scope}}]}
+                (template_dir/'playground.policy.json').write_text(json.dumps({'rules':[rule]}))
+                with patch.object(demo,'ROOT',self.out),patch.object(demo,'ready_pod',return_value=pod),patch.object(demo,'kube') as kube:
+                    with self.assertRaises(SystemExit):demo.policy(self.state)
+                    kube.assert_not_called()
 
     def test_cleanup_checks_ownership_before_any_uninstall(self):
         foreign=type('R',(),{'stdout':json.dumps({'metadata':{'labels':{}}})})()

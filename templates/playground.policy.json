@@ -27,7 +27,6 @@
           "hash": {}
         },
         {
-          "filter": "container.id == \"__PLAYGROUND_CONTAINER_ID__\"",
           "kill": {
             "signal": "SIGKILL",
             "scope": "process"
@@ -45,7 +44,6 @@
       "description": "Playground-only automated response: A BPF filter was attached to a socket after a fake PID file was created",
       "actions": [
         {
-          "filter": "container.id == \"__PLAYGROUND_CONTAINER_ID__\"",
           "kill": {
             "signal": "SIGKILL",
             "scope": "process"
@@ -68,7 +66,6 @@
           }
         },
         {
-          "filter": "container.id == \"__PLAYGROUND_CONTAINER_ID__\"",
           "kill": {
             "signal": "SIGKILL",
             "scope": "process"

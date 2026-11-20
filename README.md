@@ -1,6 +1,6 @@
 # Install the Datadog Security Playground and demonstrate automated response in EU1
 
-This guide deploys the upstream Datadog Security Playground and adds three narrowly scoped process-termination rules: cryptominer arguments, BPFDoor socket-filter activity, and mining-pool connections. A fourth rule tracks the BPFDoor PID-file marker. Every blocking expression and kill action requires the exact playground container ID.
+This guide deploys the upstream Datadog Security Playground and adds three narrowly scoped process-termination rules: cryptominer arguments, BPFDoor socket-filter activity, and mining-pool connections. A fourth rule tracks the BPFDoor PID-file marker. Every blocking rule requires the exact playground container ID in its expression before its kill action can run.
 
 This repository contains the companion rules and scripts; these additions are not part of the upstream DataDog repository. No credentials, source-environment container IDs, or existing Datadog rule IDs are included. The original demo was verified on standard GKE with Agent 7.81.1. This kit has passed offline rendering and scope checks; it has not been deployed into your EU1 organization.
 
@@ -293,6 +293,26 @@ python3 playground.py test --repo ../datadog-security-playground --test bpfdoor
 The API-only command prompts for the EU1 keys and records the new rule ID in generated/detection-state.json. The tests use the render-state from B2. The optional mining-pool test and EU1 UI checks are the same as steps 6 and 7.
 
 After a pod replacement, repeat B2, update the policy file through the existing ConfigMap's owner, wait for projection, and reload the selected Agent. For cleanup, remove only cws-playground.policy and the new mount if it was created exclusively for this demo, delete the playground application namespace, and disable the demo detection rule. Do not run Path A cleanup or uninstall the existing Agent.
+
+## Kill action syntax
+
+Add `actions` to the rule that should terminate the matching process. For example:
+
+```yaml
+rules:
+  - id: SLEEP_KILL
+    expression: exec.file.name == "sleep" && "9999" in process.argv
+    actions:
+      - kill:
+          signal: SIGKILL
+          scope: process
+```
+
+This minimal example matches `sleep` with the argument `9999`. It is illustrative and is not added to the installed playground policy. The three installed blocking rules use the same `actions: - kill:` structure and also require the exact playground container ID in their rule expressions. The BPFDoor marker remains a tracking rule without a kill action.
+
+An action-level `filter` is optional; it is omitted here because the rule expression already defines the intended match and container scope. Adding the kill action to one rule does not add it to other rules in the policy. Agent enforcement must be enabled, and the rule must load successfully for the response to run. [Datadog action syntax and requirements](https://docs.datadoghq.com/security/workload_protection/detect_and_monitor/agent_rules/variables_and_actions/)
+
+The JSON policy template uses the same structure: an `actions` array containing a `kill` object with `signal` and `scope`. Existing hash actions and the BPFDoor tracking dependency are preserved.
 
 ## Package contents and verification
 

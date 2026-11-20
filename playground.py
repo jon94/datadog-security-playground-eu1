@@ -146,7 +146,7 @@ def policy(state):
         if guard not in rule['expression']:
             fail('Rule lacks exact playground container guard: ' + rule['id'])
         for action in rule.get('actions', []):
-            if 'kill' in action and (action.get('filter') != guard or action['kill'] != {'signal': 'SIGKILL', 'scope': 'process'}):
+            if 'kill' in action and action != {'kill': {'signal': 'SIGKILL', 'scope': 'process'}}:
                 fail('Unexpected kill action scope.')
     save('playground.policy', data)
     cm = {'apiVersion': 'v1', 'kind': 'ConfigMap', 'metadata': {'name': 'playground-blocking-policy', 'namespace': AGENT_NS}, 'data': {'playground.policy': json.dumps(data, indent=2)}}
