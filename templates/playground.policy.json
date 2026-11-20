@@ -1,0 +1,84 @@
+{
+  "version": "1.0.0",
+  "rules": [
+    {
+      "id": "cws_playground_bpfdoor_marker",
+      "expression": "(open.file.path in [\"/var/run/haldrund.pid\", \"/var/run/hald-smartd.pid\", \"/var/run/system.pid\", \"/var/run/hp-health.pid\", \"/var/run/hald-addon.pid\", \"/run/haldrund.pid\", \"/run/hald-smartd.pid\", \"/run/system.pid\", \"/run/hp-health.pid\", \"/run/hald-addon.pid\"] && open.flags & O_CREAT != 0) && container.id == \"__PLAYGROUND_CONTAINER_ID__\"",
+      "description": "Track the playground BPFDoor simulator PID-file marker",
+      "silent": true,
+      "actions": [
+        {
+          "set": {
+            "name": "cws_playground_bpfdoor_pid",
+            "value": true,
+            "scope": "process",
+            "inherited": true,
+            "ttl": "10s"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cws_playground_block_cryptominer_args",
+      "expression": "(exec.args_options in [~\"cpu-priority*\", ~\"donate-level*\", ~\"wallet-address*\"] || exec.args_flags == \"randomx-1gb-pages\" || exec.args in [~\"*stratum+tcp*\", ~\"*stratum+ssl*\", ~\"*stratum1+tcp*\", ~\"*stratum1+ssl*\", ~\"*stratum2+tcp*\", ~\"*stratum2+ssl*\", ~\"*nicehash*\", ~\"*yespower*\"]) && container.id == \"__PLAYGROUND_CONTAINER_ID__\"",
+      "description": "Playground-only automated response: A process launched with arguments associated with cryptominers",
+      "actions": [
+        {
+          "hash": {}
+        },
+        {
+          "filter": "container.id == \"__PLAYGROUND_CONTAINER_ID__\"",
+          "kill": {
+            "signal": "SIGKILL",
+            "scope": "process"
+          }
+        }
+      ],
+      "tags": {
+        "demo": "workload-protection-playground",
+        "source_rule": "cryptominer_args"
+      }
+    },
+    {
+      "id": "cws_playground_block_bpfdoor_bpf_filter_creation",
+      "expression": "(setsockopt.level == SOL_SOCKET && setsockopt.optname == SO_ATTACH_FILTER && ${process.cws_playground_bpfdoor_pid} == true) && container.id == \"__PLAYGROUND_CONTAINER_ID__\"",
+      "description": "Playground-only automated response: A BPF filter was attached to a socket after a fake PID file was created",
+      "actions": [
+        {
+          "filter": "container.id == \"__PLAYGROUND_CONTAINER_ID__\"",
+          "kill": {
+            "signal": "SIGKILL",
+            "scope": "process"
+          }
+        }
+      ],
+      "tags": {
+        "demo": "workload-protection-playground",
+        "source_rule": "bpfdoor_bpf_filter_creation"
+      }
+    },
+    {
+      "id": "cws_playground_block_mining_pool_domain_v2",
+      "expression": "(connect.addr.hostname in [~\"*.minexmr.com\", \"minexmr.com\", ~\"*.nanopool.org\", \"nanopool.org\", ~\"*.supportxmr.com\", \"supportxmr.com\", ~\"*.c3pool.com\", \"c3pool.com\", ~\"*.p2pool.io\", \"p2pool.io\", ~\"*.ethermine.org\", \"ethermine.org\", ~\"*.f2pool.com\", \"f2pool.com\", ~\"*.poolin.me\", \"poolin.me\", ~\"*.rplant.xyz\", \"rplant.xyz\", ~\"*.miningocean.org\", \"miningocean.org\", \"donate.v2.xmrig.com\", ~\"*.hashvault.pro\", \"hashvault.pro\", ~\"*.moneroocean.stream\", \"moneroocean.stream\", ~\"*.skypool.org\", \"skypool.org\", ~\"*.xmrpool.eu\", \"xmrpool.eu\", ~\"*.pool.kryptex.com\", \"pool.kryptex.com\", ~\"*.herominers.com\", \"herominers.com\", ~\"*.solopool.org\", \"solopool.org\", ~\"*.monerohash.com\", \"monerohash.com\", ~\"*.antpool.com\", \"antpool.com\", ~\"*.pool.xmr.pt\", \"pool.xmr.pt\", ~\"*.monerod.org\", \"monerod.org\", ~\"*.dxpool.com\", \"dxpool.com\", ~\"*.bohemianpool.com\", \"bohemianpool.com\", ~\"*.prohashing.com\", \"prohashing.com\", ~\"*.mining-dutch.nl\", \"mining-dutch.nl\", ~\"*.gntl.uk\", \"gntl.uk\", ~\"*.fairhash.org\", \"fairhash.org\", ~\"*.volt-mine.com\", \"volt-mine.com\", ~\"*.zeropool.io\", \"zeropool.io\", ~\"*.fastpool.xyz\", \"fastpool.xyz\", ~\"*.xmr-pool.com\", \"xmr-pool.com\", ~\"*.zergpool.com\", \"zergpool.com\", ~\"*.xmrminers.com\", \"xmrminers.com\", ~\"*.monerop.com\", \"monerop.com\", ~\"*.pool-pay.com\", \"pool-pay.com\", ~\"*.solopool.pro\", \"solopool.pro\", ~\"*.frjoga.com\", \"frjoga.com\", ~\"*.infinium.space\", \"infinium.space\", ~\"*.minorpool.com\", \"minorpool.com\", ~\"*.cedric-crispin.com\", \"cedric-crispin.com\", ~\"*.aikapool.com\", \"aikapool.com\", ~\"*.2miners.com\", \"2miners.com\", ~\"*.h9.com\", \"h9.com\", ~\"*.ekapool.com\", \"ekapool.com\", ~\"*.k1pool.com\", \"k1pool.com\", ~\"*.raptorhash.net\", \"raptorhash.net\", ~\"*.miningmadness.com\", \"miningmadness.com\", ~\"*.zephyrprotocol.com\", \"zephyrprotocol.com\", ~\"*.thunderhash.com\", \"thunderhash.com\", ~\"*.newpool.xyz\", \"newpool.xyz\", ~\"*.coinminerhub.com\", \"coinminerhub.com\", ~\"*.safex.org\", \"safex.org\", ~\"*.safex.ninja\", \"safex.ninja\"] && connect.addr.is_public == true && connect.addr.port not in [53, 80, 443]) && container.id == \"__PLAYGROUND_CONTAINER_ID__\"",
+      "description": "Playground-only automated response: A process connected to a cryptocurrency mining pool",
+      "actions": [
+        {
+          "hash": {
+            "field": "process.file"
+          }
+        },
+        {
+          "filter": "container.id == \"__PLAYGROUND_CONTAINER_ID__\"",
+          "kill": {
+            "signal": "SIGKILL",
+            "scope": "process"
+          }
+        }
+      ],
+      "tags": {
+        "demo": "workload-protection-playground",
+        "source_rule": "mining_pool_domain_v2"
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+Datadog Security Playground EU1 companion guide
+
+This repository provides community installation helpers and policy examples
+for the upstream DataDog/datadog-security-playground project:
+https://github.com/DataDog/datadog-security-playground
+
+Upstream source revision used by the demo:
+32b896ac15c9414678b3d6bfa6ddbd3cbc31f16f
+
+The upstream playground is distributed under the Apache License, Version 2.0.
+Its application image and simulator binaries are obtained separately from the
+upstream project; this repository does not redistribute those binaries.
+
+This companion guide and its recording are not an official Datadog release.

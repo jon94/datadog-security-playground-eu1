@@ -1,0 +1,140 @@
+{
+  "datadog": {
+    "apiKeyExistingSecret": "playground-datadog-api",
+    "site": "datadoghq.eu",
+    "clusterName": "__CLUSTER_NAME__",
+    "kubelet": {
+      "tlsVerify": true
+    },
+    "tags": [
+      "env:security-playground",
+      "security_demo:workload-protection-playground"
+    ],
+    "collectEvents": false,
+    "kubeStateMetricsEnabled": false,
+    "operator": {
+      "enabled": false
+    },
+    "kubeStateMetricsCore": {
+      "enabled": false
+    },
+    "dogstatsd": {
+      "useHostPort": false,
+      "useSocketVolume": false
+    },
+    "apm": {
+      "socketEnabled": false,
+      "portEnabled": false
+    },
+    "processAgent": {
+      "enabled": false,
+      "processCollection": false
+    },
+    "logs": {
+      "enabled": false
+    },
+    "networkMonitoring": {
+      "enabled": false
+    },
+    "discovery": {
+      "enabled": false
+    },
+    "orchestratorExplorer": {
+      "enabled": false
+    },
+    "securityAgent": {
+      "runtime": {
+        "enabled": true,
+        "enforcement": {
+          "enabled": true
+        },
+        "policies": {
+          "configMap": "playground-blocking-policy"
+        },
+        "activityDump": {
+          "enabled": false
+        },
+        "securityProfile": {
+          "enabled": false
+        }
+      }
+    },
+    "remoteConfiguration": {
+      "enabled": false
+    },
+    "env": [
+      {
+        "name": "DD_RUNTIME_SECURITY_CONFIG_REMOTE_CONFIGURATION_ENABLED",
+        "value": "false"
+      },
+      {
+        "name": "DD_ENABLE_PAYLOADS_SERIES",
+        "value": "false"
+      },
+      {
+        "name": "DD_ENABLE_PAYLOADS_SKETCHES",
+        "value": "false"
+      },
+      {
+        "name": "DD_ENABLE_PAYLOADS_SERVICE_CHECKS",
+        "value": "false"
+      },
+      {
+        "name": "DD_ENABLE_PAYLOADS_EVENTS",
+        "value": "false"
+      }
+    ]
+  },
+  "clusterAgent": {
+    "enabled": false,
+    "admissionController": {
+      "enabled": false
+    }
+  },
+  "agents": {
+    "image": {
+      "tag": "7.81.1"
+    },
+    "nodeSelector": {
+      "kubernetes.io/hostname": "__DEMO_NODE__"
+    },
+    "containers": {
+      "agent": {
+        "resources": {
+          "requests": {
+            "cpu": "100m",
+            "memory": "256Mi"
+          },
+          "limits": {
+            "cpu": "500m",
+            "memory": "512Mi"
+          }
+        }
+      },
+      "systemProbe": {
+        "resources": {
+          "requests": {
+            "cpu": "100m",
+            "memory": "256Mi"
+          },
+          "limits": {
+            "cpu": "500m",
+            "memory": "768Mi"
+          }
+        }
+      },
+      "securityAgent": {
+        "resources": {
+          "requests": {
+            "cpu": "50m",
+            "memory": "128Mi"
+          },
+          "limits": {
+            "cpu": "250m",
+            "memory": "384Mi"
+          }
+        }
+      }
+    }
+  }
+}

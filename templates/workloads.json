@@ -1,0 +1,122 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Namespace",
+      "metadata": {
+        "name": "playground",
+        "labels": {
+          "security-demo": "workload-protection-playground"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Namespace",
+      "metadata": {
+        "name": "playground-security",
+        "labels": {
+          "security-demo": "workload-protection-playground"
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "playground-app",
+        "namespace": "playground"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app": "playground-app"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "playground-app",
+              "tags.datadoghq.com/service": "playground-app",
+              "tags.datadoghq.com/env": "security-playground",
+              "tags.datadoghq.com/version": "32b896ac15c9"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "nodeSelector": {
+              "kubernetes.io/hostname": "__DEMO_NODE__"
+            },
+            "containers": [
+              {
+                "name": "playground-app",
+                "image": "docker.io/datadog/datadog-security-playground@sha256:5aa544fb242d1f5a5751e9009b0e0d11c010bff281fe5fdf491d35d024343696",
+                "imagePullPolicy": "IfNotPresent",
+                "env": [
+                  {
+                    "name": "DD_SERVICE",
+                    "value": "playground-app"
+                  },
+                  {
+                    "name": "DD_ENV",
+                    "value": "security-playground"
+                  },
+                  {
+                    "name": "GIT_SHA",
+                    "value": "32b896ac15c9414678b3d6bfa6ddbd3cbc31f16f"
+                  }
+                ],
+                "ports": [
+                  {
+                    "containerPort": 5000,
+                    "name": "http"
+                  }
+                ],
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/ping",
+                    "port": 5000
+                  },
+                  "initialDelaySeconds": 10,
+                  "periodSeconds": 5
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "NetworkPolicy",
+      "metadata": {
+        "name": "playground-ingress-isolation",
+        "namespace": "playground"
+      },
+      "spec": {
+        "podSelector": {
+          "matchLabels": {
+            "app": "playground-app"
+          }
+        },
+        "policyTypes": [
+          "Ingress"
+        ],
+        "ingress": []
+      }
+    }
+  ]
+}

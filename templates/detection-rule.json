@@ -1,0 +1,38 @@
+{
+  "name": "[Playground] Workload response observed",
+  "isEnabled": true,
+  "type": "workload_security",
+  "queries": [
+    {
+      "query": "@agent.rule_id:(cws_playground_block_cryptominer_args OR cws_playground_block_bpfdoor_bpf_filter_creation OR cws_playground_block_mining_pool_domain_v2)",
+      "aggregation": "count",
+      "groupByFields": [
+        "@container.id",
+        "@agent.rule_id"
+      ],
+      "distinctFields": [],
+      "name": "a",
+      "dataSource": "security_runtime"
+    }
+  ],
+  "cases": [
+    {
+      "name": "Playground runtime threat detected",
+      "status": "high",
+      "condition": "a > 0",
+      "notifications": []
+    }
+  ],
+  "options": {
+    "evaluationWindow": 60,
+    "keepAlive": 300,
+    "maxSignalDuration": 3600,
+    "detectionMethod": "threshold"
+  },
+  "message": "A playground Agent rule matched and requested process termination. Open the triggering event and verify agent.rule_actions status:performed, signal:SIGKILL and scope:process. Queued or aborted actions are not proof of blocking. These rules are restricted to the playground container.",
+  "tags": [
+    "security_demo:workload-protection-playground",
+    "env:security-playground"
+  ],
+  "filters": []
+}
