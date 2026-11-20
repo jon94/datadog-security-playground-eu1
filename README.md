@@ -58,6 +58,26 @@ export DD_SITE='datadoghq.eu'
 
 Replace the two REPLACE_WITH values before continuing. The node must be schedulable and untainted for this basic recipe. The application image is pinned to the digest verified in the original demo. Use a separate copy of the kit for each cluster or Datadog organization.
 
+For example, a GKE cluster could use the following fictional values:
+
+```bash
+export KUBE_CONTEXT='gke_customer-project_europe-west1_security-demo'
+export DEMO_NODE='gke-security-demo-default-pool-a1b2c3d4-abcd'
+```
+
+`KUBE_CONTEXT` identifies the cluster connection in your kubeconfig. `DEMO_NODE` is the exact Kubernetes node name where the playground will run. Find your own values with:
+
+```bash
+# Pick a context from the NAME column, then set KUBE_CONTEXT to that value.
+kubectl config get-contexts
+
+# Using your selected context, pick a node with linux and amd64 labels.
+kubectl --context "$KUBE_CONTEXT" get nodes \
+  -L kubernetes.io/os,kubernetes.io/arch
+```
+
+Set `DEMO_NODE` to the selected node's NAME before continuing.
+
 Do not apply the upstream deploy/datadog-agent.yaml unchanged: the inspected revision selects a development Agent image and US1 settings. The companion kit uses the tested release Agent image and EU1 settings instead.
 
 ## 3 Install the isolated demo with Path A
