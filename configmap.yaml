@@ -1,4 +1,8 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jonlim-playground-policy
+  namespace: playground
 data:
   jonlim-playground.policy: |-
     {
@@ -85,4 +89,3 @@ data:
         }
       ]
     }
-kind: ConfigMap
