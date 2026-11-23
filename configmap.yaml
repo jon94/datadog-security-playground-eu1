@@ -30,7 +30,7 @@ data:
               "hash": {}
             },
             {
-              "filter": "container.id == \"5bcfe42cf6392670163226ea9fd9dc1ddac66a5fe57d7dffe628de9a45ddf5ef\"",
+              "filter": "",
               "kill": {
                 "signal": "SIGKILL",
                 "scope": "process"
@@ -48,7 +48,7 @@ data:
           "description": "Playground-only automated response: A BPF filter was attached to a socket after a fake PID file was created",
           "actions": [
             {
-              "filter": "container.id == \"5bcfe42cf6392670163226ea9fd9dc1ddac66a5fe57d7dffe628de9a45ddf5ef\"",
+              "filter": "",
               "kill": {
                 "signal": "SIGKILL",
                 "scope": "process"
@@ -71,7 +71,7 @@ data:
               }
             },
             {
-              "filter": "container.id == \"5bcfe42cf6392670163226ea9fd9dc1ddac66a5fe57d7dffe628de9a45ddf5ef\"",
+              "filter": "",
               "kill": {
                 "signal": "SIGKILL",
                 "scope": "process"
